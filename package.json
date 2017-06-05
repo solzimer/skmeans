@@ -1,6 +1,6 @@
 {
   "name": "skmeans",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Super fast simple kmeans clustering for unidimiensional data",
   "author": "David Gómez Matarrodona <solzimer@gmail.com>",
   "url": "https://github.com/owner/project/issues",
@@ -13,11 +13,9 @@
     "kmeans",
     "simple",
     "cluster",
-		"fast",
-		"unidimiensional"
+    "fast",
+    "unidimiensional"
   ],
-  "dependencies": {
-  },
-  "devDependencies": {
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
