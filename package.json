@@ -14,7 +14,8 @@
     "simple",
     "cluster",
     "fast",
-    "unidimiensional"
+    "unidimiensional",
+    "multidimensional"
   ],
   "dependencies": {},
   "devDependencies": {}
