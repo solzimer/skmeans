@@ -1,0 +1,23 @@
+{
+  "name": "skmeans",
+  "version": "0.1.0",
+  "description": "Super fast simple kmeans clustering for unidimiensional data",
+  "author": "David Gómez Matarrodona <solzimer@gmail.com>",
+  "url": "https://github.com/owner/project/issues",
+  "email": "solzimer@gmail.com",
+  "main": "main.js",
+  "license": "MIT",
+  "repository": "solzimer/skmeans",
+  "keywords": [
+    "k-means",
+    "kmeans",
+    "simple",
+    "cluster",
+		"fast",
+		"unidimiensional"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
