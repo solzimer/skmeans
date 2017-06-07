@@ -1,4 +1,4 @@
-"use strict";
+/*jshint esversion: 6 */
 
 const MAX = 10000;
 
@@ -39,6 +39,8 @@ function init(len,val) {
 }
 
 function skmeans(data,k,initial,maxit) {
+	"use strict";
+
 	var ks = [], idxs = [], len = data.length;
 	var conv = false, it = maxit || MAX;
 	var multi = data[0].length;
@@ -109,7 +111,7 @@ function skmeans(data,k,initial,maxit) {
 			}
 		}
 
-		conv = (dif==0) || (--it<=0);
+		conv = (dif===0) || (--it<=0);
 	}while(!conv);
 
 	return {
@@ -117,7 +119,7 @@ function skmeans(data,k,initial,maxit) {
 		k : k,
 		idxs : idxs,
 		centroids : ks
-	}
+	};
 }
 
 module.exports = skmeans;
