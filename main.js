@@ -80,6 +80,8 @@ function skmeans(data,k,initial,maxit) {
 
 		// If multidimensional
 		if(multi) {
+			for(let j=0;j<k;j++) ks[j] = [];
+
 			// Sum values and count for each centroid
 			for(let i=0;i<len;i++) {
 				for(let h=0;h<multi;h++) {

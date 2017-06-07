@@ -109,7 +109,9 @@
 
 				// If multidimensional
 				if (multi) {
-					// Sum values and count for each centroid
+					for (var _j2 = 0; _j2 < k; _j2++) {
+						ks[_j2] = [];
+					} // Sum values and count for each centroid
 					for (var _i2 = 0; _i2 < len; _i2++) {
 						for (var h = 0; h < multi; h++) {
 							sum[idxs[_i2]][h] += data[_i2][h];
@@ -118,10 +120,10 @@
 					}
 					// Calculate de average for each centroid
 					// and de distance between old and new centroids
-					for (var _j2 = 0; _j2 < k; _j2++) {
+					for (var _j3 = 0; _j3 < k; _j3++) {
 						for (var _h = 0; _h < multi; _h++) {
-							ks[_j2][_h] = sum[_j2][_h] / count[_j2] || 0;
-							dif += old[_j2][_h] - ks[_j2][_h];
+							ks[_j3][_h] = sum[_j3][_h] / count[_j3] || 0;
+							dif += old[_j3][_h] - ks[_j3][_h];
 						}
 					}
 				}
@@ -134,9 +136,9 @@
 						}
 						// Calculate de average for each centroid
 						// and de distance between old and new centroids
-						for (var _j3 = 0; _j3 < k; _j3++) {
-							ks[_j3] = sum[_j3] / count[_j3] || 0;
-							dif += old[_j3] - ks[_j3];
+						for (var _j4 = 0; _j4 < k; _j4++) {
+							ks[_j4] = sum[_j4] / count[_j4] || 0;
+							dif += old[_j4] - ks[_j4];
 						}
 					}
 
