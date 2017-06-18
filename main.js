@@ -41,7 +41,7 @@ function init(len,val) {
 function skmeans(data,k,initial,maxit) {
 	var ks = [], idxs = [], len = data.length;
 	var conv = false, it = maxit || MAX;
-	var multi = data[0].length;
+	var vlen = data[0].length, multi = vlen>0;
 
 	if(!initial) {
 		for(let i=0;i<k;i++) {
@@ -72,7 +72,7 @@ function skmeans(data,k,initial,maxit) {
 		for(let j=0;j<k;j++) {
 			// Multidimensional or unidimensional
 			count[j] = 0;
-			sum[j] = multi? init(multi,0) : 0;
+			sum[j] = multi? init(vlen,0) : 0;
 			old[j] = ks[j];
 		}
 
@@ -82,17 +82,19 @@ function skmeans(data,k,initial,maxit) {
 
 			// Sum values and count for each centroid
 			for(let i=0;i<len;i++) {
-				for(let h=0;h<multi;h++) {
-					sum[idxs[i]][h] += data[i][h];
+				let idx = idxs[i], vsum = sum[idx], vect = data[i];
+				for(let h=0;h<vlen;h++) {
+					vsum[h] += vect[h];
 				}
-				count[idxs[i]]++;
+				count[idx]++;
 			}
 			// Calculate de average for each centroid
 			// and de distance between old and new centroids
 			for(let j=0;j<k;j++) {
-				for(let h=0;h<multi;h++) {
-					ks[j][h] = sum[j][h]/count[j] || 0;
-					dif += old[j][h] - ks[j][h];
+				let ksj = ks[j], sumj = sum[j],oldj = old[j], cj = count[j];
+				for(let h=0;h<vlen;h++) {
+					ksj[h] = sumj[h]/cj || 0;
+					dif += oldj[h] - ksj[h];
 				}
 			}
 		}
