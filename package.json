@@ -1,7 +1,7 @@
 {
   "name": "skmeans",
   "version": "0.6.0",
-  "description": "Super fast simple kmeans clustering for unidimiensional data",
+  "description": "Super fast simple kmeans clustering for unidimiensional and multidimensional data. Works in node and browser",
   "author": "David Gómez Matarrodona <solzimer@gmail.com>",
   "url": "https://github.com/owner/project/issues",
   "email": "solzimer@gmail.com",
