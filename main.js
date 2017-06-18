@@ -32,9 +32,9 @@ function mandist(v1,v2) {
 /**
  * Inits an array with values
  */
-function init(len,val) {
-	var v = [];
-	for(let i=0;i<len;i++) v.push(val);
+function init(len,val,v) {
+	v = v || [];
+	for(let i=0;i<len;i++) v[i] = val;
 	return v;
 }
 
@@ -72,7 +72,7 @@ function skmeans(data,k,initial,maxit) {
 		for(let j=0;j<k;j++) {
 			// Multidimensional or unidimensional
 			count[j] = 0;
-			sum[j] = multi? init(vlen,0) : 0;
+			sum[j] = multi? init(vlen,0,sum[j]) : 0;
 			old[j] = ks[j];
 		}
 
@@ -90,11 +90,21 @@ function skmeans(data,k,initial,maxit) {
 			}
 			// Calculate de average for each centroid
 			// and de distance between old and new centroids
+			conv = true;
 			for(let j=0;j<k;j++) {
 				let ksj = ks[j], sumj = sum[j],oldj = old[j], cj = count[j];
+				// New average
 				for(let h=0;h<vlen;h++) {
 					ksj[h] = sumj[h]/cj || 0;
-					dif += oldj[h] - ksj[h];
+				}
+				// Find if centroids have moved
+				if(conv) {
+					for(let h=0;h<vlen;h++) {
+						if(oldj[h]!=ksj[h]) {
+							conv = false;
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -109,11 +119,18 @@ function skmeans(data,k,initial,maxit) {
 			// and de distance between old and new centroids
 			for(let j=0;j<k;j++) {
 				ks[j] = sum[j]/count[j] || 0;
-				dif += old[j] - ks[j];
+			}
+			// Find if centroids have moved
+			conv = true;
+			for(let j=0;j<k;j++) {
+				if(old[j]!=ks[j]) {
+					conv = false;
+					break;
+				}
 			}
 		}
 
-		conv = (dif===0) || (--it<=0);
+		conv = conv || (--it<=0);
 	}while(!conv);
 
 	return {

@@ -54,22 +54,21 @@
 		/**
    * Inits an array with values
    */
-		function init(len, val) {
-			var v = [];
+		function init(len, val, v) {
+			v = v || [];
 			for (var i = 0; i < len; i++) {
-				v.push(val);
+				v[i] = val;
 			}return v;
 		}
 
 		function skmeans(data, k, initial, maxit) {
-			"use strict";
-
 			var ks = [],
 			    idxs = [],
 			    len = data.length;
 			var conv = false,
 			    it = maxit || MAX;
-			var multi = data[0].length;
+			var vlen = data[0].length,
+			    multi = vlen > 0;
 
 			if (!initial) {
 				for (var i = 0; i < k; i++) {
@@ -103,7 +102,7 @@
 				for (var _j = 0; _j < k; _j++) {
 					// Multidimensional or unidimensional
 					count[_j] = 0;
-					sum[_j] = multi ? init(multi, 0) : 0;
+					sum[_j] = multi ? init(vlen, 0, sum[_j]) : 0;
 					old[_j] = ks[_j];
 				}
 
@@ -113,17 +112,34 @@
 						ks[_j2] = [];
 					} // Sum values and count for each centroid
 					for (var _i2 = 0; _i2 < len; _i2++) {
-						for (var h = 0; h < multi; h++) {
-							sum[idxs[_i2]][h] += data[_i2][h];
+						var _idx = idxs[_i2],
+						    vsum = sum[_idx],
+						    vect = data[_i2];
+						for (var h = 0; h < vlen; h++) {
+							vsum[h] += vect[h];
 						}
-						count[idxs[_i2]]++;
+						count[_idx]++;
 					}
 					// Calculate de average for each centroid
 					// and de distance between old and new centroids
+					conv = true;
 					for (var _j3 = 0; _j3 < k; _j3++) {
-						for (var _h = 0; _h < multi; _h++) {
-							ks[_j3][_h] = sum[_j3][_h] / count[_j3] || 0;
-							dif += old[_j3][_h] - ks[_j3][_h];
+						var ksj = ks[_j3],
+						    sumj = sum[_j3],
+						    oldj = old[_j3],
+						    cj = count[_j3];
+						// New average
+						for (var _h = 0; _h < vlen; _h++) {
+							ksj[_h] = sumj[_h] / cj || 0;
+						}
+						// Find if centroids have moved
+						if (conv) {
+							for (var _h2 = 0; _h2 < vlen; _h2++) {
+								if (oldj[_h2] != ksj[_h2]) {
+									conv = false;
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -138,11 +154,18 @@
 						// and de distance between old and new centroids
 						for (var _j4 = 0; _j4 < k; _j4++) {
 							ks[_j4] = sum[_j4] / count[_j4] || 0;
-							dif += old[_j4] - ks[_j4];
+						}
+						// Find if centroids have moved
+						conv = true;
+						for (var _j5 = 0; _j5 < k; _j5++) {
+							if (old[_j5] != ks[_j5]) {
+								conv = false;
+								break;
+							}
 						}
 					}
 
-				conv = dif === 0 || --it <= 0;
+				conv = conv || --it <= 0;
 			} while (!conv);
 
 			return {
