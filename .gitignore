@@ -33,6 +33,7 @@ $RECYCLE.BIN/
 
 # Node
 node_modules
+test/perf
 
 # Files that might appear in the root of a volume
 .DocumentRevisions-V100

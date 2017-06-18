@@ -1,8 +1,6 @@
 /*jshint esversion: 6 */
 
 const MAX = 10000;
-const abs = Math.abs;
-const sqrt = Math.sqrt;
 
 /**
  * Euclidean distance
@@ -15,7 +13,7 @@ function eudist(v1,v2) {
 			var d = (v1[i]||0) - (v2[i]||0);
 			sum += d*d;
 		}
-		return sqrt(sum);
+		return Math.sqrt(sum);
 }
 
 /**
@@ -26,7 +24,7 @@ function mandist(v1,v2) {
 		var sum = 0;
 
 		for(let i=0;i<len;i++) {
-			sum += abs((v1[i]||0) - (v2[i]||0));
+			sum += Math.abs((v1[i]||0) - (v2[i]||0));
 		}
 		return sum;
 }
@@ -41,8 +39,6 @@ function init(len,val) {
 }
 
 function skmeans(data,k,initial,maxit) {
-	"use strict";
-
 	var ks = [], idxs = [], len = data.length;
 	var conv = false, it = maxit || MAX;
 	var multi = data[0].length;
@@ -62,7 +58,7 @@ function skmeans(data,k,initial,maxit) {
 			let min = Infinity, idx = 0;
 			for(let j=0;j<k;j++) {
 				// Multidimensional or unidimensional
-				var dist = multi? eudist(data[i],ks[j]) : abs(data[i]-ks[j]);
+				var dist = multi? eudist(data[i],ks[j]) : Math.abs(data[i]-ks[j]);
 				if(dist<min) {
 					min = dist;
 					idx = j;
