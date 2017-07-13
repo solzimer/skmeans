@@ -46,7 +46,7 @@ var res = skmeans(data,3);
 
 ## API
 ### skmeans(data,k,[centroids],[iterations])
-Calculates unidimiensional k-means clustering on *data*. Parameters are:
+Calculates unidimiensional and multidimensional k-means clustering on *data*. Parameters are:
 * **data** Unidimiensional or multidimensional array of values to be clustered. for unidimiensional data, takes the form of a simple array *[1,2,3.....,n]*. For multidimensional data, takes a
 NxM array *[[1,2],[2,3]....[n,m]]*
 * **k** Number of clusters
