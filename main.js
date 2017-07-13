@@ -6,27 +6,35 @@ const MAX = 10000;
  * Euclidean distance
  */
 function eudist(v1,v2) {
-		var len = v1.length;
-		var sum = 0;
+	var len = v1.length;
+	var sum = 0;
 
-		for(let i=0;i<len;i++) {
-			var d = (v1[i]||0) - (v2[i]||0);
-			sum += d*d;
-		}
-		return Math.sqrt(sum);
+	for(let i=0;i<len;i++) {
+		var d = (v1[i]||0) - (v2[i]||0);
+		sum += d*d;
+	}
+	// Square root not really needed
+	return sum;	//Math.sqrt(sum);
 }
 
 /**
  * Manhattan distance
  */
 function mandist(v1,v2) {
-		var len = v1.length;
-		var sum = 0;
+	var len = v1.length;
+	var sum = 0;
 
-		for(let i=0;i<len;i++) {
-			sum += Math.abs((v1[i]||0) - (v2[i]||0));
-		}
-		return sum;
+	for(let i=0;i<len;i++) {
+		sum += Math.abs((v1[i]||0) - (v2[i]||0));
+	}
+	return sum;
+}
+
+function equals(v1,v2,multi) {
+	var l = v1.length;
+	for(var i=0;i<l;i++)
+		if(v1[i]!=v2[i]) return false;
+	return true;
 }
 
 /**
@@ -39,9 +47,9 @@ function init(len,val,v) {
 }
 
 function skmeans(data,k,initial,maxit) {
-	var ks = [], idxs = [], len = data.length;
+	var ks = [], old = [], idxs = [], dist = [];
 	var conv = false, it = maxit || MAX;
-	var vlen = data[0].length, multi = vlen>0;
+	var len = data.length, vlen = data[0].length, multi = vlen>0;
 
 	if(!initial) {
 		for(let i=0;i<k;i++) {
