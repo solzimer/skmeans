@@ -35,7 +35,8 @@
 				var d = (v1[i] || 0) - (v2[i] || 0);
 				sum += d * d;
 			}
-			return Math.sqrt(sum);
+			// Square root not really needed
+			return sum; //Math.sqrt(sum);
 		}
 
 		/**
@@ -51,6 +52,13 @@
 			return sum;
 		}
 
+		function equals(v1, v2, multi) {
+			var l = v1.length;
+			for (var i = 0; i < l; i++) {
+				if (v1[i] != v2[i]) return false;
+			}return true;
+		}
+
 		/**
    * Inits an array with values
    */
@@ -63,11 +71,13 @@
 
 		function skmeans(data, k, initial, maxit) {
 			var ks = [],
+			    old = [],
 			    idxs = [],
-			    len = data.length;
+			    dist = [];
 			var conv = false,
 			    it = maxit || MAX;
-			var vlen = data[0].length,
+			var len = data.length,
+			    vlen = data[0].length,
 			    multi = vlen > 0;
 
 			if (!initial) {
@@ -113,24 +123,31 @@
 					} // Sum values and count for each centroid
 					for (var _i2 = 0; _i2 < len; _i2++) {
 						var _idx = idxs[_i2],
-						    vsum = sum[_idx],
-						    vect = data[_i2];
+						    // Centroid for that item
+						vsum = sum[_idx],
+						    // Sum values for this centroid
+						vect = data[_i2]; // Current vector
+
+						// Accumulate value on the centroid for current vector
 						for (var h = 0; h < vlen; h++) {
 							vsum[h] += vect[h];
 						}
-						count[_idx]++;
+						count[_idx]++; // Number of values for this centroid
 					}
-					// Calculate de average for each centroid
-					// and de distance between old and new centroids
+					// Calculate the average for each centroid
 					conv = true;
 					for (var _j3 = 0; _j3 < k; _j3++) {
 						var ksj = ks[_j3],
-						    sumj = sum[_j3],
-						    oldj = old[_j3],
-						    cj = count[_j3];
+						    // Current centroid
+						sumj = sum[_j3],
+						    // Accumulated centroid values
+						oldj = old[_j3],
+						    // Old centroid value
+						cj = count[_j3]; // Number of elements for this centrois
+
 						// New average
 						for (var _h = 0; _h < vlen; _h++) {
-							ksj[_h] = sumj[_h] / cj || 0;
+							ksj[_h] = sumj[_h] / cj || 0; // New centroid
 						}
 						// Find if centroids have moved
 						if (conv) {
@@ -147,13 +164,13 @@
 				else {
 						// Sum values and count for each centroid
 						for (var _i3 = 0; _i3 < len; _i3++) {
-							sum[idxs[_i3]] += data[_i3];
-							count[idxs[_i3]]++;
+							var _idx2 = idxs[_i3];
+							sum[_idx2] += data[_i3];
+							count[_idx2]++;
 						}
-						// Calculate de average for each centroid
-						// and de distance between old and new centroids
+						// Calculate the average for each centroid
 						for (var _j4 = 0; _j4 < k; _j4++) {
-							ks[_j4] = sum[_j4] / count[_j4] || 0;
+							ks[_j4] = sum[_j4] / count[_j4] || 0; // New centroid
 						}
 						// Find if centroids have moved
 						conv = true;
