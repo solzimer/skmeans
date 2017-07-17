@@ -52,7 +52,6 @@ function kmrand(data,k) {
 		}
 	}
 
-	console.log(ks);
 	return ks;
 }
 
