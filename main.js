@@ -176,7 +176,6 @@ function skmeans(data,k,initial,maxit) {
 				// New average
 				for(let h=0;h<vlen;h++) {
 					ksj[h] = sumj[h]/cj || 0;	// New centroid
-					if(ksj[h]==0) debugger;
 				}
 				// Find if centroids have moved
 				if(conv) {
