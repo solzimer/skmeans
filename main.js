@@ -25,6 +25,37 @@ function dist(v1,v2,sqrt) {
 	return sqrt? d : d*d;
 }
 
+function kmrand(data,k) {
+	var map = {}, list = [];
+	var ks = [];
+
+	data.forEach(d=>{
+		var key = JSON.stringify(d);
+		map[key] = map[k]||d;
+	});
+	for(var key in map) list.push(map[key]);
+	if(k>list.length) {
+		throw new Error("Cluster size greater than distinct data points");
+	}
+	else {
+		var len = data.length, map = {};
+		for(let i=0;i<k;i++) {
+			var b = false;
+			while(!b) {
+				var v = list[Math.floor(Math.random()*len)];
+				var key = JSON.stringify(v);
+				if(!map[key]) {
+					ks.push(v);
+					map[key] = true;
+					b = true;
+				}
+			}
+		}
+	}
+
+	return ks;
+}
+
 /**
  * K-means++ initial centroid selection
  */
@@ -81,9 +112,11 @@ function skmeans(data,k,initial,maxit) {
 	var len = data.length, vlen = data[0].length, multi = vlen>0;
 
 	if(!initial) {
-		for(let i=0;i<k;i++) {
+		for(let i=0;i<k;i++)
 			ks.push(data[Math.floor(Math.random()*len)]);
-		}
+	}
+	else if(initial=="kmrand") {
+		ks = kmrand(data,k);
 	}
 	else if(initial=="kmpp") {
 		ks = kmpp(data,k);
@@ -99,7 +132,7 @@ function skmeans(data,k,initial,maxit) {
 			for(let j=0;j<k;j++) {
 				// Multidimensional or unidimensional
 				var dist = multi? eudist(data[i],ks[j]) : Math.abs(data[i]-ks[j]);
-				if(dist<min) {
+				if(dist<=min) {
 					min = dist;
 					idx = j;
 				}
@@ -124,7 +157,7 @@ function skmeans(data,k,initial,maxit) {
 			for(let i=0;i<len;i++) {
 				let idx = idxs[i],	// Centroid for that item
 					vsum = sum[idx],	// Sum values for this centroid
-					vect = data[i];		// Current vector
+					vect = data[idx];	// Current vector
 
 				// Accumulate value on the centroid for current vector
 				for(let h=0;h<vlen;h++) {
@@ -143,6 +176,7 @@ function skmeans(data,k,initial,maxit) {
 				// New average
 				for(let h=0;h<vlen;h++) {
 					ksj[h] = sumj[h]/cj || 0;	// New centroid
+					if(ksj[h]==0) debugger;
 				}
 				// Find if centroids have moved
 				if(conv) {
