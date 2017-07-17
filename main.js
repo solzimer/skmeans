@@ -27,32 +27,32 @@ function dist(v1,v2,sqrt) {
 
 function kmrand(data,k) {
 	var map = {}, list = [];
-	var ks = [];
+	var ks = [], len = data.length
 
-	data.forEach(d=>{
+	for(let i=0;i<len;i++) {
+		let d = data[i];
 		var key = JSON.stringify(d);
-		map[key] = map[k]||d;
-	});
-	for(var key in map) list.push(map[key]);
+		if(!map[key]) {
+			map[key] = true;
+			list.push(d);
+		}
+	};
+
 	if(k>list.length) {
 		throw new Error("Cluster size greater than distinct data points");
 	}
 	else {
-		var len = data.length, map = {};
-		for(let i=0;i<k;i++) {
-			var b = false;
-			while(!b) {
-				var v = list[Math.floor(Math.random()*len)];
-				var key = JSON.stringify(v);
-				if(!map[key]) {
-					ks.push(v);
-					map[key] = true;
-					b = true;
-				}
+		let l = list.length, m = {};
+		while(ks.length<k) {
+			let idx = Math.floor(Math.random()*l);
+			if(!m[idx]) {
+				m[idx] = true;
+				ks.push(list[idx]);
 			}
 		}
 	}
 
+	console.log(ks);
 	return ks;
 }
 
