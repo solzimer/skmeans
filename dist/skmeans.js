@@ -27,7 +27,7 @@
 		/**
    * Euclidean distance
    */
-		function eudist(v1, v2) {
+		function eudist(v1, v2, sqrt) {
 			var len = v1.length;
 			var sum = 0;
 
@@ -36,27 +36,76 @@
 				sum += d * d;
 			}
 			// Square root not really needed
-			return sum; //Math.sqrt(sum);
+			return sqrt ? Math.sqrt(sum) : sum;
 		}
 
 		/**
-   * Manhattan distance
+   * Unidimensional distance
    */
-		function mandist(v1, v2) {
-			var len = v1.length;
-			var sum = 0;
-
-			for (var i = 0; i < len; i++) {
-				sum += Math.abs((v1[i] || 0) - (v2[i] || 0));
-			}
-			return sum;
+		function dist(v1, v2, sqrt) {
+			var d = Math.abs(v1 - v2);
+			return sqrt ? d : d * d;
 		}
 
-		function equals(v1, v2, multi) {
-			var l = v1.length;
-			for (var i = 0; i < l; i++) {
-				if (v1[i] != v2[i]) return false;
-			}return true;
+		/**
+   * K-means++ initial centroid selection
+   */
+		function kmpp(data, k) {
+			var _this = this;
+
+			var dfn = data[0].length ? eudist : dist;
+			var ks = [],
+			    len = data.length;
+
+			// First random centroid
+			var c = data[Math.floor(Math.random() * len)];
+			ks.push(c);
+
+			// Retrieve next centroids
+
+			var _loop = function _loop() {
+				// Min Distances
+				var dists = data.map(function (v) {
+					// Return the min distance of v to current centroids
+					var ksd = ks.map(function (c) {
+						return dfn(v, c);
+					});
+					return Math.min.apply(_this, ksd);
+				});
+
+				// Distance sum
+				var dsum = dists.reduce(function (r, v) {
+					return r + v;
+				}, 0);
+
+				// Probabilities and cummulative prob (cumsum)
+				var prs = dists.map(function (d, i) {
+					return { i: i, v: data[i], pr: d / dsum };
+				});
+				prs.sort(function (a, b) {
+					return a.pr - b.pr;
+				});
+				prs.forEach(function (p, i) {
+					p.cs = p.pr + (i > 0 ? prs[i - 1].cs : 0);
+				});
+
+				// Randomize
+				var rnd = Math.random();
+
+				// Gets only the items whose cumsum >= rnd
+				var mprs = prs.filter(function (p) {
+					return p.cs >= rnd;
+				});
+
+				// this is our new centroid
+				ks.push(mprs[0].v);
+			};
+
+			while (ks.length < k) {
+				_loop();
+			}
+
+			return ks;
 		}
 
 		/**
@@ -84,6 +133,8 @@
 				for (var i = 0; i < k; i++) {
 					ks.push(data[Math.floor(Math.random() * len)]);
 				}
+			} else if (initial == "kmpp") {
+				ks = kmpp(data, k);
 			} else {
 				ks = initial;
 			}

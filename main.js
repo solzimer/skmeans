@@ -5,7 +5,7 @@ const MAX = 10000;
 /**
  * Euclidean distance
  */
-function eudist(v1,v2) {
+function eudist(v1,v2,sqrt) {
 	var len = v1.length;
 	var sum = 0;
 
@@ -14,27 +14,56 @@ function eudist(v1,v2) {
 		sum += d*d;
 	}
 	// Square root not really needed
-	return sum;	//Math.sqrt(sum);
+	return sqrt? Math.sqrt(sum) : sum;
 }
 
 /**
- * Manhattan distance
+ * Unidimensional distance
  */
-function mandist(v1,v2) {
-	var len = v1.length;
-	var sum = 0;
-
-	for(let i=0;i<len;i++) {
-		sum += Math.abs((v1[i]||0) - (v2[i]||0));
-	}
-	return sum;
+function dist(v1,v2,sqrt) {
+	var d = Math.abs(v1-v2);
+	return sqrt? d : d*d;
 }
 
-function equals(v1,v2,multi) {
-	var l = v1.length;
-	for(var i=0;i<l;i++)
-		if(v1[i]!=v2[i]) return false;
-	return true;
+/**
+ * K-means++ initial centroid selection
+ */
+function kmpp(data,k) {
+	var dfn = data[0].length? eudist : dist;
+	var ks = [], len = data.length;
+
+	// First random centroid
+	var c = data[Math.floor(Math.random()*len)];
+	ks.push(c);
+
+	// Retrieve next centroids
+	while(ks.length<k) {
+		// Min Distances
+		let dists = data.map(v=>{
+			// Return the min distance of v to current centroids
+			let ksd = ks.map(c=>dfn(v,c));
+			return Math.min.apply(this,ksd);
+		});
+
+		// Distance sum
+		let dsum = dists.reduce((r,v)=>r+v,0);
+
+		// Probabilities and cummulative prob (cumsum)
+		let prs = dists.map((d,i)=>{return {i:i,v:data[i],pr:d/dsum}});
+		prs.sort((a,b)=>a.pr-b.pr);
+		prs.forEach((p,i)=>{p.cs = p.pr + (i>0? prs[i-1].cs : 0)});
+
+		// Randomize
+		let rnd = Math.random();
+
+		// Gets only the items whose cumsum >= rnd
+		let mprs = prs.filter(p=>p.cs>=rnd);
+
+		// this is our new centroid
+		ks.push(mprs[0].v);
+	}
+
+	return ks;
 }
 
 /**
@@ -55,6 +84,9 @@ function skmeans(data,k,initial,maxit) {
 		for(let i=0;i<k;i++) {
 			ks.push(data[Math.floor(Math.random()*len)]);
 		}
+	}
+	else if(initial=="kmpp") {
+		ks = kmpp(data,k);
 	}
 	else {
 		ks = initial;

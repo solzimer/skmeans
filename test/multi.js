@@ -10,3 +10,6 @@ for(let i=0;i<2000;i++) {
 
 var res = skmeans(data,3);
 console.log(res.it,res.centroids);
+
+var res = skmeans(data,3,"kmpp");
+console.log(res.it,res.centroids);

@@ -50,7 +50,7 @@ Calculates unidimiensional and multidimensional k-means clustering on *data*. Pa
 * **data** Unidimiensional or multidimensional array of values to be clustered. for unidimiensional data, takes the form of a simple array *[1,2,3.....,n]*. For multidimensional data, takes a
 NxM array *[[1,2],[2,3]....[n,m]]*
 * **k** Number of clusters
-* **centroids** Optional. Initial centroid values. If not provided, the algorith will try to choose an apropiate ones.
+* **centroids** Optional. Initial centroid values. If not provided, the algorith will try to choose an apropiate ones. You can pass **"kmpp"** as argument, so the algorythm will use the [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) cluster initialization method.
 * **iterations** Optional. Maximum number of iterations. If not provided, it will be set to 10000.
 
 The function will return an object with the following data:
