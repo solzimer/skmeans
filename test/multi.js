@@ -8,7 +8,7 @@ for(let i=0;i<2000;i++) {
 	else data.push([r+9,2*(r+9)]);
 }
 
-var res = skmeans(data,3);
+var res = skmeans(data,3,"kmrand");
 console.log(res.it,res.centroids);
 
 var res = skmeans(data,3,"kmpp");

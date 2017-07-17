@@ -1,100 +1,14 @@
 /*jshint esversion: 6 */
 
+const
+	Distance = require("./distance.js"),
+	ClusterInit = require("./kinit.js"),
+	eudist = Distance.eudist,
+	dist = Distance.dist,
+	kmrand = ClusterInit.kmrand,
+	kmpp = ClusterInit.kmpp;
+
 const MAX = 10000;
-
-/**
- * Euclidean distance
- */
-function eudist(v1,v2,sqrt) {
-	var len = v1.length;
-	var sum = 0;
-
-	for(let i=0;i<len;i++) {
-		var d = (v1[i]||0) - (v2[i]||0);
-		sum += d*d;
-	}
-	// Square root not really needed
-	return sqrt? Math.sqrt(sum) : sum;
-}
-
-/**
- * Unidimensional distance
- */
-function dist(v1,v2,sqrt) {
-	var d = Math.abs(v1-v2);
-	return sqrt? d : d*d;
-}
-
-function kmrand(data,k) {
-	var map = {}, list = [];
-	var ks = [], len = data.length
-
-	for(let i=0;i<len;i++) {
-		let d = data[i];
-		var key = JSON.stringify(d);
-		if(!map[key]) {
-			map[key] = true;
-			list.push(d);
-		}
-	};
-
-	if(k>list.length) {
-		throw new Error("Cluster size greater than distinct data points");
-	}
-	else {
-		let l = list.length, m = {};
-		while(ks.length<k) {
-			let idx = Math.floor(Math.random()*l);
-			if(!m[idx]) {
-				m[idx] = true;
-				ks.push(list[idx]);
-			}
-		}
-	}
-
-	return ks;
-}
-
-/**
- * K-means++ initial centroid selection
- */
-function kmpp(data,k) {
-	var dfn = data[0].length? eudist : dist;
-	var ks = [], len = data.length;
-
-	// First random centroid
-	var c = data[Math.floor(Math.random()*len)];
-	ks.push(c);
-
-	// Retrieve next centroids
-	while(ks.length<k) {
-		// Min Distances
-		let dists = data.map(v=>{
-			// Return the min distance of v to current centroids
-			let ksd = ks.map(c=>dfn(v,c));
-			return Math.min.apply(this,ksd);
-		});
-
-		// Distance sum
-		let dsum = dists.reduce((r,v)=>r+v,0);
-
-		// Probabilities and cummulative prob (cumsum)
-		let prs = dists.map((d,i)=>{return {i:i,v:data[i],pr:d/dsum}});
-		prs.sort((a,b)=>a.pr-b.pr);
-		prs.forEach((p,i)=>{p.cs = p.pr + (i>0? prs[i-1].cs : 0)});
-
-		// Randomize
-		let rnd = Math.random();
-
-		// Gets only the items whose cumsum >= rnd
-		let mprs = prs.filter(p=>p.cs>=rnd);
-
-		// this is our new centroid
-		ks.push(mprs[0].v);
-	}
-
-	return ks;
-}
 
 /**
  * Inits an array with values

@@ -19,127 +19,146 @@
 			var skmeans = require("./main.js");
 			$.skmeans = skmeans;
 		})(window);
-	}, { "./main.js": 2 }], 2: [function (require, module, exports) {
-		/*jshint esversion: 6 */
+	}, { "./main.js": 4 }], 2: [function (require, module, exports) {
+		module.exports = {
+			/**
+    * Euclidean distance
+    */
+			eudist: function eudist(v1, v2, sqrt) {
+				var len = v1.length;
+				var sum = 0;
 
-		var MAX = 10000;
-
-		/**
-   * Euclidean distance
-   */
-		function eudist(v1, v2, sqrt) {
-			var len = v1.length;
-			var sum = 0;
-
-			for (var i = 0; i < len; i++) {
-				var d = (v1[i] || 0) - (v2[i] || 0);
-				sum += d * d;
-			}
-			// Square root not really needed
-			return sqrt ? Math.sqrt(sum) : sum;
-		}
-
-		/**
-   * Unidimensional distance
-   */
-		function dist(v1, v2, sqrt) {
-			var d = Math.abs(v1 - v2);
-			return sqrt ? d : d * d;
-		}
-
-		function kmrand(data, k) {
-			var map = {},
-			    list = [];
-			var ks = [],
-			    len = data.length;
-
-			for (var i = 0; i < len; i++) {
-				var d = data[i];
-				var key = JSON.stringify(d);
-				if (!map[key]) {
-					map[key] = true;
-					list.push(d);
+				for (var i = 0; i < len; i++) {
+					var d = (v1[i] || 0) - (v2[i] || 0);
+					sum += d * d;
 				}
-			};
+				// Square root not really needed
+				return sqrt ? Math.sqrt(sum) : sum;
+			},
 
-			if (k > list.length) {
-				throw new Error("Cluster size greater than distinct data points");
-			} else {
-				var l = list.length,
-				    m = {};
-				while (ks.length < k) {
-					var idx = Math.floor(Math.random() * l);
-					if (!m[idx]) {
-						m[idx] = true;
-						ks.push(list[idx]);
+
+			/**
+    * Unidimensional distance
+    */
+			dist: function dist(v1, v2, sqrt) {
+				var d = Math.abs(v1 - v2);
+				return sqrt ? d : d * d;
+			}
+		};
+	}, {}], 3: [function (require, module, exports) {
+		var Distance = require("./distance.js"),
+		    eudist = Distance.eudist,
+		    dist = Distance.dist;
+
+		module.exports = {
+			kmrand: function kmrand(data, k) {
+				var map = {},
+				    list = [];
+				var ks = [],
+				    len = data.length;
+
+				for (var i = 0; i < len; i++) {
+					var d = data[i];
+					var key = JSON.stringify(d);
+					if (!map[key]) {
+						map[key] = true;
+						list.push(d);
+					}
+				};
+
+				if (k > list.length) {
+					throw new Error("Cluster size greater than distinct data points");
+				} else {
+					var l = list.length,
+					    m = {};
+					while (ks.length < k) {
+						var idx = Math.floor(Math.random() * l);
+						if (!m[idx]) {
+							m[idx] = true;
+							ks.push(list[idx]);
+						}
 					}
 				}
-			}
 
-			console.log(ks);
-			return ks;
-		}
+				return ks;
+			},
 
-		/**
-   * K-means++ initial centroid selection
-   */
-		function kmpp(data, k) {
-			var _this = this;
 
-			var dfn = data[0].length ? eudist : dist;
-			var ks = [],
-			    len = data.length;
+			/**
+    * K-means++ initial centroid selection
+    */
+			kmpp: function kmpp(data, k) {
+				var distance = data[0].length ? eudist : dist;
+				var ks = [],
+				    len = data.length;
 
-			// First random centroid
-			var c = data[Math.floor(Math.random() * len)];
-			ks.push(c);
+				// First random centroid
+				var c = data[Math.floor(Math.random() * len)];
+				ks.push(c);
 
-			// Retrieve next centroids
+				// Retrieve next centroids
+				while (ks.length < k) {
+					// Min Distances between current centroids and data points
+					var dists = [],
+					    lk = ks.length;
+					var dsum = 0,
+					    prs = [];
 
-			var _loop = function _loop() {
-				// Min Distances
-				var dists = data.map(function (v) {
-					// Return the min distance of v to current centroids
-					var ksd = ks.map(function (c) {
-						return dfn(v, c);
+					for (var i = 0; i < len; i++) {
+						var min = Infinity;
+						for (var j = 0; j < lk; j++) {
+							var _dist = distance(data[i], ks[j]);
+							if (_dist <= min) min = _dist;
+						}
+						dists[i] = min;
+					}
+
+					// Sum all min distances
+					for (var _i = 0; _i < len; _i++) {
+						dsum += dists[_i];
+					}
+
+					// Probabilities and cummulative prob (cumsum)
+					for (var _i2 = 0; _i2 < len; _i2++) {
+						prs[_i2] = { i: _i2, v: data[_i2], pr: dists[_i2] / dsum, cs: 0 };
+					}
+
+					// Sort Probabilities
+					prs.sort(function (a, b) {
+						return a.pr - b.pr;
 					});
-					return Math.min.apply(_this, ksd);
-				});
 
-				// Distance sum
-				var dsum = dists.reduce(function (r, v) {
-					return r + v;
-				}, 0);
+					// Cummulative Probabilities
+					prs[0].cs = prs[0].pr;
+					for (var _i3 = 1; _i3 < len; _i3++) {
+						prs[_i3].cs = prs[_i3 - 1].cs + prs[_i3].pr;
+					}
 
-				// Probabilities and cummulative prob (cumsum)
-				var prs = dists.map(function (d, i) {
-					return { i: i, v: data[i], pr: d / dsum };
-				});
-				prs.sort(function (a, b) {
-					return a.pr - b.pr;
-				});
-				prs.forEach(function (p, i) {
-					p.cs = p.pr + (i > 0 ? prs[i - 1].cs : 0);
-				});
+					// Randomize
+					var rnd = Math.random();
 
-				// Randomize
-				var rnd = Math.random();
+					// Gets only the items whose cumsum >= rnd
+					var idx = 0;
+					while (idx < len - 1 && prs[idx++].cs >= rnd) {}
 
-				// Gets only the items whose cumsum >= rnd
-				var mprs = prs.filter(function (p) {
-					return p.cs >= rnd;
-				});
+					// this is our new centroid
+					ks.push(prs[idx - 1].v);
+				}
 
-				// this is our new centroid
-				ks.push(mprs[0].v);
-			};
-
-			while (ks.length < k) {
-				_loop();
+				return ks;
 			}
+		};
+	}, { "./distance.js": 2 }], 4: [function (require, module, exports) {
+		/*jshint esversion: 6 */
 
-			return ks;
-		}
+		var Distance = require("./distance.js"),
+		    ClusterInit = require("./kinit.js"),
+		    eudist = Distance.eudist,
+		    dist = Distance.dist,
+		    kmrand = ClusterInit.kmrand,
+		    kmpp = ClusterInit.kmpp;
+
+		var MAX = 10000;
 
 		/**
    * Inits an array with values
@@ -176,18 +195,18 @@
 
 			do {
 				// For each value in data, find the nearest centroid
-				for (var _i = 0; _i < len; _i++) {
+				for (var _i4 = 0; _i4 < len; _i4++) {
 					var min = Infinity,
 					    idx = 0;
 					for (var j = 0; j < k; j++) {
 						// Multidimensional or unidimensional
-						var dist = multi ? eudist(data[_i], ks[j]) : Math.abs(data[_i] - ks[j]);
+						var dist = multi ? eudist(data[_i4], ks[j]) : Math.abs(data[_i4] - ks[j]);
 						if (dist <= min) {
 							min = dist;
 							idx = j;
 						}
 					}
-					idxs[_i] = idx;
+					idxs[_i4] = idx;
 				}
 
 				// Recalculate centroids
@@ -207,8 +226,8 @@
 					for (var _j2 = 0; _j2 < k; _j2++) {
 						ks[_j2] = [];
 					} // Sum values and count for each centroid
-					for (var _i2 = 0; _i2 < len; _i2++) {
-						var _idx = idxs[_i2],
+					for (var _i5 = 0; _i5 < len; _i5++) {
+						var _idx = idxs[_i5],
 						    // Centroid for that item
 						vsum = sum[_idx],
 						    // Sum values for this centroid
@@ -249,9 +268,9 @@
 				// If unidimensional
 				else {
 						// Sum values and count for each centroid
-						for (var _i3 = 0; _i3 < len; _i3++) {
-							var _idx2 = idxs[_i3];
-							sum[_idx2] += data[_i3];
+						for (var _i6 = 0; _i6 < len; _i6++) {
+							var _idx2 = idxs[_i6];
+							sum[_idx2] += data[_i6];
 							count[_idx2]++;
 						}
 						// Calculate the average for each centroid
@@ -280,5 +299,5 @@
 		}
 
 		module.exports = skmeans;
-	}, {}] }, {}, [1]);
+	}, { "./distance.js": 2, "./kinit.js": 3 }] }, {}, [1]);
 //# sourceMappingURL=skmeans.js.map
