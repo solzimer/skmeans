@@ -182,8 +182,13 @@
 			    multi = vlen > 0;
 
 			if (!initial) {
-				for (var i = 0; i < k; i++) {
-					ks.push(data[Math.floor(Math.random() * len)]);
+				var _idxs = {};
+				while (ks.length < k) {
+					var idx = Math.floor(Math.random() * len);
+					if (!_idxs[idx]) {
+						_idxs[idx] = true;
+						ks.push(data[idx]);
+					}
 				}
 			} else if (initial == "kmrand") {
 				ks = kmrand(data, k);
@@ -195,18 +200,18 @@
 
 			do {
 				// For each value in data, find the nearest centroid
-				for (var _i4 = 0; _i4 < len; _i4++) {
+				for (var i = 0; i < len; i++) {
 					var min = Infinity,
-					    idx = 0;
+					    _idx = 0;
 					for (var j = 0; j < k; j++) {
 						// Multidimensional or unidimensional
-						var dist = multi ? eudist(data[_i4], ks[j]) : Math.abs(data[_i4] - ks[j]);
+						var dist = multi ? eudist(data[i], ks[j]) : Math.abs(data[i] - ks[j]);
 						if (dist <= min) {
 							min = dist;
-							idx = j;
+							_idx = j;
 						}
 					}
-					idxs[_i4] = idx;
+					idxs[i] = _idx;
 				}
 
 				// Recalculate centroids
@@ -226,18 +231,18 @@
 					for (var _j2 = 0; _j2 < k; _j2++) {
 						ks[_j2] = [];
 					} // Sum values and count for each centroid
-					for (var _i5 = 0; _i5 < len; _i5++) {
-						var _idx = idxs[_i5],
+					for (var _i4 = 0; _i4 < len; _i4++) {
+						var _idx2 = idxs[_i4],
 						    // Centroid for that item
-						vsum = sum[_idx],
+						vsum = sum[_idx2],
 						    // Sum values for this centroid
-						vect = data[_idx]; // Current vector
+						vect = data[_idx2]; // Current vector
 
 						// Accumulate value on the centroid for current vector
 						for (var h = 0; h < vlen; h++) {
 							vsum[h] += vect[h];
 						}
-						count[_idx]++; // Number of values for this centroid
+						count[_idx2]++; // Number of values for this centroid
 					}
 					// Calculate the average for each centroid
 					conv = true;
@@ -268,10 +273,10 @@
 				// If unidimensional
 				else {
 						// Sum values and count for each centroid
-						for (var _i6 = 0; _i6 < len; _i6++) {
-							var _idx2 = idxs[_i6];
-							sum[_idx2] += data[_i6];
-							count[_idx2]++;
+						for (var _i5 = 0; _i5 < len; _i5++) {
+							var _idx3 = idxs[_i5];
+							sum[_idx3] += data[_i5];
+							count[_idx3]++;
 						}
 						// Calculate the average for each centroid
 						for (var _j4 = 0; _j4 < k; _j4++) {
