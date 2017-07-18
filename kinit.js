@@ -5,33 +5,21 @@ const
 
 module.exports = {
 	kmrand(data,k) {
-		var map = {}, list = [];
-		var ks = [], len = data.length
+		var map = {}, ks = [], t = k<<2;
+		var len = data.length;
+		var multi = data[0].length>0;
 
-		for(let i=0;i<len;i++) {
-			let d = data[i];
-			var key = JSON.stringify(d);
+		while(ks.length<k && (t--)>0) {
+			let d = data[Math.floor(Math.random()*len)];
+			let key = multi? d.join("_") : `${d}`;
 			if(!map[key]) {
 				map[key] = true;
-				list.push(d);
-			}
-		};
-
-		if(k>list.length) {
-			throw new Error("Cluster size greater than distinct data points");
-		}
-		else {
-			let l = list.length, m = {};
-			while(ks.length<k) {
-				let idx = Math.floor(Math.random()*l);
-				if(!m[idx]) {
-					m[idx] = true;
-					ks.push(list[idx]);
-				}
+				ks.push(d);
 			}
 		}
 
-		return ks;
+		if(ks.length<k) throw new Error("Error initializating clusters");
+		else return ks;
 	},
 
 	/**
