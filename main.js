@@ -25,8 +25,14 @@ function skmeans(data,k,initial,maxit) {
 	var len = data.length, vlen = data[0].length, multi = vlen>0;
 
 	if(!initial) {
-		for(let i=0;i<k;i++)
-			ks.push(data[Math.floor(Math.random()*len)]);
+		let idxs = {};
+		while(ks.length<k) {
+			let idx = Math.floor(Math.random()*len);
+			if(!idxs[idx]) {
+				idxs[idx] = true;
+				ks.push(data[idx]);
+			}
+		}
 	}
 	else if(initial=="kmrand") {
 		ks = kmrand(data,k);
