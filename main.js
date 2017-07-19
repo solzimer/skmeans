@@ -50,7 +50,7 @@ function skmeans(data,k,initial,maxit) {
 			let min = Infinity, idx = 0;
 			for(let j=0;j<k;j++) {
 				// Multidimensional or unidimensional
-				var dist = multi? eudist(data[i],ks[j],true) : Math.abs(data[i]-ks[j]);
+				var dist = multi? eudist(data[i],ks[j]) : Math.abs(data[i]-ks[j]);
 				if(dist<=min) {
 					min = dist;
 					idx = j;
@@ -76,7 +76,7 @@ function skmeans(data,k,initial,maxit) {
 			for(let i=0;i<len;i++) {
 				let idx = idxs[i],	// Centroid for that item
 					vsum = sum[idx],	// Sum values for this centroid
-					vect = data[idx];	// Current vector
+					vect = data[i];		// Current vector
 
 				// Accumulate value on the centroid for current vector
 				for(let h=0;h<vlen;h++) {
@@ -94,7 +94,8 @@ function skmeans(data,k,initial,maxit) {
 
 				// New average
 				for(let h=0;h<vlen;h++) {
-					ksj[h] = sumj[h]/cj || 0;	// New centroid
+					//ksj[h] = (sumj[h]+oldj[h])/(cj+1) || 0;	// New centroid
+					ksj[h] = (sumj[h])/(cj) || 0;	// New centroid
 				}
 				// Find if centroids have moved
 				if(conv) {
