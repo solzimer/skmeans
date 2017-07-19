@@ -1,7 +1,7 @@
 const skmeans = require("../main.js");
 const data = require("./data/well-separated.js");
 
-var res = skmeans(data,3,"kmrand");
+var res = skmeans(data,3,"kmpp");
 console.error(res);
 var out = data.map((d,i)=>{
 	return {

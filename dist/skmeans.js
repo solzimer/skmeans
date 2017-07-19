@@ -78,10 +78,14 @@
 				var distance = data[0].length ? eudist : dist;
 				var ks = [],
 				    len = data.length;
+				var multi = data[0].length > 0;
+				var map = {};
 
 				// First random centroid
 				var c = data[Math.floor(Math.random() * len)];
+				var key = multi ? c.join("_") : "" + c;
 				ks.push(c);
+				map[key] = true;
 
 				// Retrieve next centroids
 				while (ks.length < k) {
@@ -128,8 +132,19 @@
 					var idx = 0;
 					while (idx < len - 1 && prs[idx++].cs >= rnd) {}
 
-					// this is our new centroid
-					ks.push(prs[idx - 1].v);
+					var done = false;
+					while (!done) {
+						// this is our new centroid
+						c = prs[idx - 1].v;
+						key = multi ? c.join("_") : "" + c;
+						if (!map[key]) {
+							map[key] = true;
+							ks.push(c);
+							done = true;
+						} else {
+							idx++;
+						}
+					}
 				}
 
 				return ks;
@@ -223,7 +238,7 @@
 						    // Centroid for that item
 						vsum = sum[_idx2],
 						    // Sum values for this centroid
-						vect = data[_idx2]; // Current vector
+						vect = data[_i4]; // Current vector
 
 						// Accumulate value on the centroid for current vector
 						for (var h = 0; h < vlen; h++) {
@@ -240,10 +255,11 @@
 						    // Accumulated centroid values
 						oldj = old[_j3],
 						    // Old centroid value
-						cj = count[_j3]; // Number of elements for this centrois
+						cj = count[_j3]; // Number of elements for this centroid
 
 						// New average
 						for (var _h = 0; _h < vlen; _h++) {
+							//ksj[h] = (sumj[h]+oldj[h])/(cj+1) || 0;	// New centroid
 							ksj[_h] = sumj[_h] / cj || 0; // New centroid
 						}
 						// Find if centroids have moved
