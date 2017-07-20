@@ -130,21 +130,24 @@
 
 					// Gets only the items whose cumsum >= rnd
 					var idx = 0;
-					while (idx < len - 1 && prs[idx++].cs >= rnd) {}
-
-					var done = false;
-					while (!done) {
-						// this is our new centroid
-						c = prs[idx - 1].v;
-						key = multi ? c.join("_") : "" + c;
-						if (!map[key]) {
-							map[key] = true;
-							ks.push(c);
-							done = true;
-						} else {
-							idx++;
-						}
-					}
+					while (idx < len - 1 && prs[idx++].cs < rnd) {}
+					ks.push(prs[idx - 1].v);
+					/*
+     let done = false;
+     while(!done) {
+     	// this is our new centroid
+     	c = prs[idx-1].v
+     	key = multi? c.join("_") : `${c}`;
+     	if(!map[key]) {
+     		map[key] = true;
+     		ks.push(c);
+     		done = true;
+     	}
+     	else {
+     		idx++;
+     	}
+     }
+     */
 				}
 
 				return ks;
