@@ -1,14 +1,7 @@
 const skmeans = require("../main.js");
-const data1 = [];
+const data1 = require("./data/well-separated.js");
 const data2 = require("./data/random_pts.js");
 const MAX = 1000;
-
-for(let i=0;i<2000;i++) {
-	var r = Math.random();
-	if(r>=0 && r<0.33) data1.push([r,r*2]);
-	else if(r>=0.33 && r<0.66) data1.push([r+4,2*(r+4)]);
-	else data1.push([r+9,2*(r+9)]);
-}
 
 console.log("Simple data (k=3)");
 var its = 0;
