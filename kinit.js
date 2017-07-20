@@ -76,8 +76,9 @@ module.exports = {
 
 			// Gets only the items whose cumsum >= rnd
 			let idx = 0;
-			while(idx<len-1 && prs[idx++].cs>=rnd);
-
+			while(idx<len-1 && prs[idx++].cs<rnd);
+			ks.push(prs[idx-1].v);
+			/*
 			let done = false;
 			while(!done) {
 				// this is our new centroid
@@ -92,6 +93,7 @@ module.exports = {
 					idx++;
 				}
 			}
+			*/
 		}
 
 		return ks;
