@@ -1,8 +1,8 @@
 const skmeans = require("../main.js");
-const data = require("./data/well-separated.js");
+const data = require("./data/random_pts.js");
 
 var method = process.argv[2] || null;
-var res = skmeans(data,3,method);
+var res = skmeans(data,16,method);
 console.error(res);
 var out = data.map((d,i)=>{
 	return {
