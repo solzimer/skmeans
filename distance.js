@@ -14,6 +14,18 @@ module.exports = {
 		return sqrt? Math.sqrt(sum) : sum;
 	},
 
+	mandist(v1,v2,sqrt) {
+		var len = v1.length;
+		var sum = 0;
+
+		for(let i=0;i<len;i++) {
+			sum += Math.abs((v1[i]||0) - (v2[i]||0));
+		}
+
+		// Square root not really needed
+		return sqrt? Math.sqrt(sum) : sum;
+	},
+
 	/**
 	 * Unidimensional distance
 	 */

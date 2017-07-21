@@ -4,6 +4,7 @@ const
 	Distance = require("./distance.js"),
 	ClusterInit = require("./kinit.js"),
 	eudist = Distance.eudist,
+	mandist = Distance.mandist,
 	dist = Distance.dist,
 	kmrand = ClusterInit.kmrand,
 	kmpp = ClusterInit.kmpp;
@@ -23,6 +24,7 @@ function skmeans(data,k,initial,maxit) {
 	var ks = [], old = [], idxs = [], dist = [];
 	var conv = false, it = maxit || MAX;
 	var len = data.length, vlen = data[0].length, multi = vlen>0;
+	var count = [];
 
 	if(!initial) {
 		let idxs = {};
@@ -45,6 +47,9 @@ function skmeans(data,k,initial,maxit) {
 	}
 
 	do {
+		// Reset k count
+		init(k,0,count);
+
 		// For each value in data, find the nearest centroid
 		for(let i=0;i<len;i++) {
 			let min = Infinity, idx = 0;
@@ -56,14 +61,14 @@ function skmeans(data,k,initial,maxit) {
 					idx = j;
 				}
 			}
-			idxs[i] = idx;
+			idxs[i] = idx;	// Index of the selected centroid for that value
+			count[idx]++;		// Number of values for this centroid
 		}
 
 		// Recalculate centroids
-		var count = [], sum = [], old = [], dif = 0;
+		var sum = [], old = [], dif = 0;
 		for(let j=0;j<k;j++) {
 			// Multidimensional or unidimensional
-			count[j] = 0;
 			sum[j] = multi? init(vlen,0,sum[j]) : 0;
 			old[j] = ks[j];
 		}
@@ -74,29 +79,28 @@ function skmeans(data,k,initial,maxit) {
 
 			// Sum values and count for each centroid
 			for(let i=0;i<len;i++) {
-				let idx = idxs[i],	// Centroid for that item
-					vsum = sum[idx],	// Sum values for this centroid
-					vect = data[i];		// Current vector
+				let	idx = idxs[i],		// Centroid for that item
+						vsum = sum[idx],	// Sum values for this centroid
+						vect = data[i];		// Current vector
 
 				// Accumulate value on the centroid for current vector
 				for(let h=0;h<vlen;h++) {
 					vsum[h] += vect[h];
 				}
-				count[idx]++;	// Number of values for this centroid
 			}
 			// Calculate the average for each centroid
 			conv = true;
 			for(let j=0;j<k;j++) {
-				let ksj = ks[j],	// Current centroid
-					sumj = sum[j],	// Accumulated centroid values
-					oldj = old[j], 	// Old centroid value
-					cj = count[j];	// Number of elements for this centroid
+				let ksj = ks[j],		// Current centroid
+						sumj = sum[j],	// Accumulated centroid values
+						oldj = old[j], 	// Old centroid value
+						cj = count[j];	// Number of elements for this centroid
 
 				// New average
 				for(let h=0;h<vlen;h++) {
-					//ksj[h] = (sumj[h]+oldj[h])/(cj+1) || 0;	// New centroid
 					ksj[h] = (sumj[h])/(cj) || 0;	// New centroid
 				}
+
 				// Find if centroids have moved
 				if(conv) {
 					for(let h=0;h<vlen;h++) {
@@ -114,7 +118,6 @@ function skmeans(data,k,initial,maxit) {
 			for(let i=0;i<len;i++) {
 				let idx = idxs[i];
 				sum[idx] += data[i];
-				count[idx]++;
 			}
 			// Calculate the average for each centroid
 			for(let j=0;j<k;j++) {
