@@ -28,12 +28,13 @@ module.exports = function(grunt) {
 	    options: {
 	      banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 	    },
-			build: {
-      	src: 'dist/skmeans.js',
-      	dest: 'dist/skmeans.min.js'
-    	}
+			dist : {
+				files: {
+					'dist/skmeans.min.js' : ['dist/skmeans.js']
+				}
+			}
 	  },
-		clean: ['dist/skmeans.js','skmeans.js.map']
+		clean: ['dist/*.js','dist/*.map']
 	});
 
 	grunt.registerTask('default', ['browserify','babel','uglify']);
