@@ -1,6 +1,6 @@
 # skmeans
 
-Super fast simple k-means implementation for unidimiensional and multidimensional data. Works on nodejs and browser.
+Super fast simple k-means and [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) implementation for unidimiensional and multidimensional data. Works on nodejs and browser.
 
 ## Installation
 ```
