@@ -5,7 +5,7 @@
   "author": "David Gómez Matarrodona <solzimer@gmail.com>",
   "url": "https://github.com/owner/project/issues",
   "email": "solzimer@gmail.com",
-  "main": "main.js",
+  "main": "dist/node/main.js",
   "license": "MIT",
   "repository": "solzimer/skmeans",
   "keywords": [

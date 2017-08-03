@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 				watch: true,
 				keepAlive: true,
 				files: {
-					'dist/skmeans.js': ['browser.js']
+					'dist/browser/skmeans.js': ['browser.js']
 				}
 			}
 		},
@@ -19,9 +19,17 @@ module.exports = function(grunt) {
 				presets: ['es2015']
 			},
 			dist: {
-				files: {
-					'dist/skmeans.js': 'dist/skmeans.js'
-				}
+				files: [
+					{
+						expand: true,
+						src: ['*.js'],
+						dest: 'dist/node',
+						ext: '.js'
+					},
+					{
+						'dist/browser/skmeans.js': ['dist/browser/skmeans.js'],
+					}
+				]
 			}
 		},
 	  uglify: {
@@ -30,11 +38,11 @@ module.exports = function(grunt) {
 	    },
 			dist : {
 				files: {
-					'dist/skmeans.min.js' : ['dist/skmeans.js']
+					'dist/browser/skmeans.min.js' : ['dist/browser/skmeans.js']
 				}
 			}
 	  },
-		clean: ['dist/*.js','dist/*.map']
+		clean: ['dist/browser/*.js','dist/browser/*.map']
 	});
 
 	grunt.registerTask('default', ['browserify','babel','uglify']);

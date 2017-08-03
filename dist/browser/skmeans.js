@@ -15,10 +15,22 @@
 })({ 1: [function (require, module, exports) {
 		"use strict";
 
-		(function ($) {
-			var skmeans = require("./main.js");
-			$.skmeans = skmeans;
-		})(window);
+		(function () {
+			var root = this;
+			var previous_skmeans = root.skmeans;
+			var skmeans = require('./main.js');
+
+			if (typeof exports !== 'undefined') {
+				if (typeof module !== 'undefined' && module.exports) {
+					exports = module.exports = skmeans;
+				}
+				exports.skmeans = skmeans;
+			}
+
+			if (typeof window !== 'undefined') {
+				window.skmeans = skmeans;
+			}
+		}).call(this);
 	}, { "./main.js": 4 }], 2: [function (require, module, exports) {
 		module.exports = {
 			/**
@@ -32,6 +44,17 @@
 					var d = (v1[i] || 0) - (v2[i] || 0);
 					sum += d * d;
 				}
+				// Square root not really needed
+				return sqrt ? Math.sqrt(sum) : sum;
+			},
+			mandist: function mandist(v1, v2, sqrt) {
+				var len = v1.length;
+				var sum = 0;
+
+				for (var i = 0; i < len; i++) {
+					sum += Math.abs((v1[i] || 0) - (v2[i] || 0));
+				}
+
 				// Square root not really needed
 				return sqrt ? Math.sqrt(sum) : sum;
 			},
@@ -159,6 +182,7 @@
 		var Distance = require("./distance.js"),
 		    ClusterInit = require("./kinit.js"),
 		    eudist = Distance.eudist,
+		    mandist = Distance.mandist,
 		    dist = Distance.dist,
 		    kmrand = ClusterInit.kmrand,
 		    kmpp = ClusterInit.kmpp;
@@ -185,6 +209,7 @@
 			var len = data.length,
 			    vlen = data[0].length,
 			    multi = vlen > 0;
+			var count = [];
 
 			if (!initial) {
 				var _idxs = {};
@@ -204,6 +229,9 @@
 			}
 
 			do {
+				// Reset k count
+				init(k, 0, count);
+
 				// For each value in data, find the nearest centroid
 				for (var i = 0; i < len; i++) {
 					var min = Infinity,
@@ -216,17 +244,16 @@
 							_idx = j;
 						}
 					}
-					idxs[i] = _idx;
+					idxs[i] = _idx; // Index of the selected centroid for that value
+					count[_idx]++; // Number of values for this centroid
 				}
 
 				// Recalculate centroids
-				var count = [],
-				    sum = [],
+				var sum = [],
 				    old = [],
 				    dif = 0;
 				for (var _j = 0; _j < k; _j++) {
 					// Multidimensional or unidimensional
-					count[_j] = 0;
 					sum[_j] = multi ? init(vlen, 0, sum[_j]) : 0;
 					old[_j] = ks[_j];
 				}
@@ -247,7 +274,6 @@
 						for (var h = 0; h < vlen; h++) {
 							vsum[h] += vect[h];
 						}
-						count[_idx2]++; // Number of values for this centroid
 					}
 					// Calculate the average for each centroid
 					conv = true;
@@ -262,9 +288,9 @@
 
 						// New average
 						for (var _h = 0; _h < vlen; _h++) {
-							//ksj[h] = (sumj[h]+oldj[h])/(cj+1) || 0;	// New centroid
 							ksj[_h] = sumj[_h] / cj || 0; // New centroid
 						}
+
 						// Find if centroids have moved
 						if (conv) {
 							for (var _h2 = 0; _h2 < vlen; _h2++) {
@@ -282,7 +308,6 @@
 						for (var _i5 = 0; _i5 < len; _i5++) {
 							var _idx3 = idxs[_i5];
 							sum[_idx3] += data[_i5];
-							count[_idx3]++;
 						}
 						// Calculate the average for each centroid
 						for (var _j4 = 0; _j4 < k; _j4++) {
