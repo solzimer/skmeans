@@ -9,6 +9,7 @@
   "license": "MIT",
   "repository": "solzimer/skmeans",
   "keywords": [
+		"math",
     "k-means",
     "k-means++",
     "kmeans++",
