@@ -199,7 +199,7 @@
 			}return v;
 		}
 
-		function skmeans(data, k, initial, maxit) {
+		function skmeans(data, k, initial, maxit, fndist) {
 			var ks = [],
 			    old = [],
 			    idxs = [],
@@ -237,8 +237,9 @@
 					var min = Infinity,
 					    _idx = 0;
 					for (var j = 0; j < k; j++) {
-						// Multidimensional or unidimensional
-						var dist = multi ? eudist(data[i], ks[j]) : Math.abs(data[i] - ks[j]);
+						// Custom, Multidimensional or unidimensional
+						var dist = fndist ? fndist(data[i], ks[k]) : multi ? eudist(data[i], ks[j]) : Math.abs(data[i] - ks[j]);
+
 						if (dist <= min) {
 							min = dist;
 							_idx = j;
