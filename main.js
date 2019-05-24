@@ -55,7 +55,7 @@ function skmeans(data,k,initial,maxit,fndist) {
 			let min = Infinity, idx = 0;
 			for(let j=0;j<k;j++) {
 				// Custom, Multidimensional or unidimensional
-				var dist =	fndist ? fndist(data[i],ks[k]) :
+				var dist =	fndist ? fndist(data[i],ks[j]) :
 										multi? eudist(data[i],ks[j]) :
 										Math.abs(data[i]-ks[j]);
 

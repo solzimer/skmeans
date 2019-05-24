@@ -281,7 +281,7 @@
 
           for (var j = 0; j < k; j++) {
             // Custom, Multidimensional or unidimensional
-            var dist = fndist ? fndist(data[i], ks[k]) : multi ? eudist(data[i], ks[j]) : Math.abs(data[i] - ks[j]);
+            var dist = fndist ? fndist(data[i], ks[j]) : multi ? eudist(data[i], ks[j]) : Math.abs(data[i] - ks[j]);
 
             if (dist <= min) {
               min = dist;
