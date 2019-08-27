@@ -5,7 +5,7 @@ const
 	ClusterInit = require("./kinit.js"),
 	eudist = Distance.eudist,
 	mandist = Distance.mandist,
-	dist = Distance.dist,
+	absdist = Distance.dist,
 	kmrand = ClusterInit.kmrand,
 	kmpp = ClusterInit.kmpp;
 
@@ -20,6 +20,31 @@ function init(len,val,v) {
 	return v;
 }
 
+function test(point, fndist) {
+	let
+		multi = Array.isArray(point),
+		ks = this.centroids,
+		k = ks.length;
+
+	// For each value in data, find the nearest centroid
+	let min = Infinity, idx = 0;
+	for(let j=0;j<k;j++) {
+		// Custom, Multidimensional or unidimensional
+		let dist =	fndist? fndist(point,ks[j]) :
+								multi? eudist(point,ks[j]) :
+								Math.abs(point-ks[j]);
+
+		if(dist<=min) {
+			min = dist;
+			idx = j;
+		}
+	}
+
+	return {
+		idx, centroid:ks[idx]
+	}
+}
+
 function skmeans(data,k,initial,maxit,fndist) {
 	var ks = [], old = [], idxs = [], dist = [];
 	var conv = false, it = maxit || MAX;
@@ -27,12 +52,12 @@ function skmeans(data,k,initial,maxit,fndist) {
 	var count = [];
 
 	if(!initial) {
-		let idxs = {};
+		let idxs = {}, z=0;
 		while(ks.length<k) {
 			let idx = Math.floor(Math.random()*len);
 			if(!idxs[idx]) {
 				idxs[idx] = true;
-				ks.push(data[idx]);
+				ks[z++] = data[idx];
 			}
 		}
 	}
@@ -70,10 +95,17 @@ function skmeans(data,k,initial,maxit,fndist) {
 
 		// Recalculate centroids
 		var sum = [], old = [], dif = 0;
-		for(let j=0;j<k;j++) {
-			// Multidimensional or unidimensional
-			sum[j] = multi? init(vlen,0,sum[j]) : 0;
-			old[j] = ks[j];
+		if(multi) {
+			for(let j=0;j<k;j++) {
+				sum[j] = init(vlen,0,sum[j]);
+				old[j] = ks[j];
+			}
+		}
+		else {
+			for(let j=0;j<k;j++) {
+				sum[j] = 0;
+				old[j] = ks[j];
+			}
 		}
 
 		// If multidimensional
@@ -143,7 +175,8 @@ function skmeans(data,k,initial,maxit,fndist) {
 		it : MAX-it,
 		k : k,
 		idxs : idxs,
-		centroids : ks
+		centroids : ks,
+		test : test
 	};
 }
 

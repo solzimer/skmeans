@@ -2,7 +2,7 @@ module.exports = {
 	/**
 	 * Euclidean distance
 	 */
-	eudist(v1,v2,sqrt) {
+	eudist(v1,v2) {
 		var len = v1.length;
 		var sum = 0;
 
@@ -11,19 +11,19 @@ module.exports = {
 			sum += d*d;
 		}
 		// Square root not really needed
-		return sqrt? Math.sqrt(sum) : sum;
+		return sum;
 	},
 
-	mandist(v1,v2,sqrt) {
+	mandist(v1,v2) {
 		var len = v1.length;
-		var sum = 0;
+		var sum = 0, d = 0;
 
 		for(let i=0;i<len;i++) {
-			sum += Math.abs((v1[i]||0) - (v2[i]||0));
+			d = (v1[i]||0) - (v2[i]||0);
+			sum += (d>=0)? d : -d;
 		}
 
-		// Square root not really needed
-		return sqrt? Math.sqrt(sum) : sum;
+		return sum;
 	},
 
 	/**

@@ -62,7 +62,7 @@
       /**
        * Euclidean distance
        */
-      eudist: function eudist(v1, v2, sqrt) {
+      eudist: function eudist(v1, v2) {
         var len = v1.length;
         var sum = 0;
 
@@ -72,18 +72,19 @@
         } // Square root not really needed
 
 
-        return sqrt ? Math.sqrt(sum) : sum;
+        return sum;
       },
-      mandist: function mandist(v1, v2, sqrt) {
+      mandist: function mandist(v1, v2) {
         var len = v1.length;
-        var sum = 0;
+        var sum = 0,
+            d = 0;
 
         for (var i = 0; i < len; i++) {
-          sum += Math.abs((v1[i] || 0) - (v2[i] || 0));
-        } // Square root not really needed
+          d = (v1[i] || 0) - (v2[i] || 0);
+          sum += d >= 0 ? d : -d;
+        }
 
-
-        return sqrt ? Math.sqrt(sum) : sum;
+        return sum;
       },
 
       /**
@@ -221,7 +222,7 @@
         ClusterInit = require("./kinit.js"),
         eudist = Distance.eudist,
         mandist = Distance.mandist,
-        dist = Distance.dist,
+        absdist = Distance.dist,
         kmrand = ClusterInit.kmrand,
         kmpp = ClusterInit.kmpp;
 
@@ -240,6 +241,30 @@
       return v;
     }
 
+    function test(point, fndist) {
+      var multi = Array.isArray(point),
+          ks = this.centroids,
+          k = ks.length; // For each value in data, find the nearest centroid
+
+      var min = Infinity,
+          idx = 0;
+
+      for (var j = 0; j < k; j++) {
+        // Custom, Multidimensional or unidimensional
+        var dist = fndist ? fndist(point, ks[j]) : multi ? eudist(point, ks[j]) : Math.abs(point - ks[j]);
+
+        if (dist <= min) {
+          min = dist;
+          idx = j;
+        }
+      }
+
+      return {
+        idx: idx,
+        centroid: ks[idx]
+      };
+    }
+
     function skmeans(data, k, initial, maxit, fndist) {
       var ks = [],
           old = [],
@@ -253,14 +278,15 @@
       var count = [];
 
       if (!initial) {
-        var _idxs = {};
+        var _idxs = {},
+            z = 0;
 
         while (ks.length < k) {
           var idx = Math.floor(Math.random() * len);
 
           if (!_idxs[idx]) {
             _idxs[idx] = true;
-            ks.push(data[idx]);
+            ks[z++] = data[idx];
           }
         }
       } else if (initial == "kmrand") {
@@ -299,16 +325,22 @@
             old = [],
             dif = 0;
 
-        for (var _j = 0; _j < k; _j++) {
-          // Multidimensional or unidimensional
-          sum[_j] = multi ? init(vlen, 0, sum[_j]) : 0;
-          old[_j] = ks[_j];
+        if (multi) {
+          for (var _j = 0; _j < k; _j++) {
+            sum[_j] = init(vlen, 0, sum[_j]);
+            old[_j] = ks[_j];
+          }
+        } else {
+          for (var _j2 = 0; _j2 < k; _j2++) {
+            sum[_j2] = 0;
+            old[_j2] = ks[_j2];
+          }
         } // If multidimensional
 
 
         if (multi) {
-          for (var _j2 = 0; _j2 < k; _j2++) {
-            ks[_j2] = [];
+          for (var _j3 = 0; _j3 < k; _j3++) {
+            ks[_j3] = [];
           } // Sum values and count for each centroid
 
 
@@ -328,14 +360,14 @@
 
           conv = true;
 
-          for (var _j3 = 0; _j3 < k; _j3++) {
-            var ksj = ks[_j3],
+          for (var _j4 = 0; _j4 < k; _j4++) {
+            var ksj = ks[_j4],
                 // Current centroid
-            sumj = sum[_j3],
+            sumj = sum[_j4],
                 // Accumulated centroid values
-            oldj = old[_j3],
+            oldj = old[_j4],
                 // Old centroid value
-            cj = count[_j3]; // Number of elements for this centroid
+            cj = count[_j4]; // Number of elements for this centroid
             // New average
 
             for (var _h = 0; _h < vlen; _h++) {
@@ -361,15 +393,15 @@
             } // Calculate the average for each centroid
 
 
-            for (var _j4 = 0; _j4 < k; _j4++) {
-              ks[_j4] = sum[_j4] / count[_j4] || 0; // New centroid
+            for (var _j5 = 0; _j5 < k; _j5++) {
+              ks[_j5] = sum[_j5] / count[_j5] || 0; // New centroid
             } // Find if centroids have moved
 
 
             conv = true;
 
-            for (var _j5 = 0; _j5 < k; _j5++) {
-              if (old[_j5] != ks[_j5]) {
+            for (var _j6 = 0; _j6 < k; _j6++) {
+              if (old[_j6] != ks[_j6]) {
                 conv = false;
                 break;
               }
@@ -383,7 +415,8 @@
         it: MAX - it,
         k: k,
         idxs: idxs,
-        centroids: ks
+        centroids: ks,
+        test: test
       };
     }
 

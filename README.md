@@ -61,6 +61,7 @@ The function will return an object with the following data:
 * **k** The cluster size
 * **centroids** The value for each centroid of the cluster
 * **idxs** The index to the centroid corresponding to each value of the data array
+* **test** Function to test new point membership
 
 ## Examples
 ```javascript
@@ -78,4 +79,12 @@ var res = skmeans(data,3,null,10);
 
 // k-means with 3 clusters. Custom distance function
 var res = skmeans(data,3,null,null,(x1,x2)=>Math.abs(x1-x2));
+
+// Test new point
+var res = skmeans(data,3,null,10);
+res.test(6);
+
+// Test new point with custom distance
+var res = skmeans(data,3,null,10);
+res.test(6,(x1,x2)=>Math.abs(x1-x2));
 ```
