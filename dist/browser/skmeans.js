@@ -125,8 +125,8 @@
       /**
        * K-means++ initial centroid selection
        */
-      kmpp: function kmpp(data, k) {
-        var distance = data[0].length ? eudist : dist;
+      kmpp: function kmpp(data, k, fndist) {
+        var distance = fndist || (data[0].length ? eudist : dist);
         var ks = [],
             len = data.length;
         var multi = data[0].length > 0;
@@ -292,7 +292,7 @@
       } else if (initial == "kmrand") {
         ks = kmrand(data, k);
       } else if (initial == "kmpp") {
-        ks = kmpp(data, k);
+        ks = kmpp(data, k, fndist);
       } else {
         ks = initial;
       }

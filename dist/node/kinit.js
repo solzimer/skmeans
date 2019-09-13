@@ -28,8 +28,8 @@ module.exports = {
   /**
    * K-means++ initial centroid selection
    */
-  kmpp: function kmpp(data, k) {
-    var distance = data[0].length ? eudist : dist;
+  kmpp: function kmpp(data, k, fndist) {
+    var distance = fndist || (data[0].length ? eudist : dist);
     var ks = [],
         len = data.length;
     var multi = data[0].length > 0;

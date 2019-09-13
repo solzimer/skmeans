@@ -75,7 +75,7 @@ function skmeans(data, k, initial, maxit, fndist) {
   } else if (initial == "kmrand") {
     ks = kmrand(data, k);
   } else if (initial == "kmpp") {
-    ks = kmpp(data, k);
+    ks = kmpp(data, k, fndist);
   } else {
     ks = initial;
   }
