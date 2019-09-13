@@ -40,7 +40,7 @@ function skmeans(data,k,initial,maxit,fndist) {
 		ks = kmrand(data,k);
 	}
 	else if(initial=="kmpp") {
-		ks = kmpp(data,k);
+		ks = kmpp(data,k,fndist);
 	}
 	else {
 		ks = initial;
