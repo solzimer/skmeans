@@ -172,7 +172,7 @@ function skmeans(data,k,initial,maxit,fndist) {
 	}while(!conv);
 
 	return {
-		it : MAX-it,
+		it : (maxit || MAX) - it,
 		k : k,
 		idxs : idxs,
 		centroids : ks,

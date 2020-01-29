@@ -412,7 +412,7 @@
       } while (!conv);
 
       return {
-        it: MAX - it,
+        it: (maxit || MAX) - it,
         k: k,
         idxs: idxs,
         centroids: ks,
