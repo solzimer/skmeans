@@ -68,7 +68,7 @@ function skmeans(data,k,initial,maxit,fndist) {
 		ks = kmpp(data,k,fndist);
 	}
 	else {
-		ks = initial;
+		ks = [...initial];
 	}
 
 	do {
