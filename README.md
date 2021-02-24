@@ -1,6 +1,6 @@
 # skmeans
 
-Super fast simple k-means and [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) implementation for unidimiensional and multidimensional data. Works on nodejs and browser.
+Superfast simple k-means and [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) implementation for unidimensional and multidimensional data. Works on nodejs and browser.
 
 ## Installation
 ```
@@ -46,13 +46,13 @@ var res = skmeans(data,3);
 
 ## API
 ### skmeans(data,k,[centroids],[iterations])
-Calculates unidimiensional and multidimensional k-means clustering on *data*. Parameters are:
-* **data** Unidimiensional or multidimensional array of values to be clustered. for unidimiensional data, takes the form of a simple array *[1,2,3.....,n]*. For multidimensional data, takes a
+Calculates unidimensional and multidimensional k-means clustering on *data*. Parameters are:
+* **data** Unidimensional or multidimensional array of values to be clustered. For unidimensional data, takes the form of a simple array *[1,2,3.....,n]*. For multidimensional data, takes a
 NxM array *[[1,2],[2,3]....[n,m]]*
 * **k** Number of clusters
-* **centroids** Optional. Initial centroid values. If not provided, the algorith will try to choose an apropiate ones. Alternative values can be:
-  * **"kmrand"** Cluster initialization will be random, but with extra checking, so there will no be two equal initial centroids.
-  * **"kmpp"** The algorythm will use the [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) cluster initialization method.
+* **centroids** Optional. Initial centroid values. If not provided, the algorithm will try to choose appropriate ones. Alternative values can be:
+  * **"kmrand"** Cluster initialization will be random, but with extra checking, so there will not be two equal initial centroids.
+  * **"kmpp"** The algorithm will use the [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) cluster initialization method.
 * **iterations** Optional. Maximum number of iterations. If not provided, it will be set to 10000.
 * **distance function** Optional. Custom distance function. Takes two points as arguments and returns a scalar number.
 
